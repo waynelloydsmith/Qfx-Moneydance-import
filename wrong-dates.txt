@@ -1,0 +1,80 @@
+from https://infinitekind.tenderapp.com/discussions/problems/102169-wrong-date2
+
+I download transactions from 4 Canadian banks at least once a month.
+Recently I added bank #4 to the mix.
+I started to experience date shifting on the transactions and decided to figure out what was going on.
+Below are the results of some testing I did.
+
+Bank #1
+qfx file says ... <DTPOSTED>20240620120000.000[-5:EST] uses noon instead of midnight.
+using qfx with this bank is fine since a 1 or 2 hour difference in posting time doesn't cause the day to change.
+Also found no long descriptions being truncated. Uses both the Description and Memo fields.
+
+Bank #2
+qfx file says ... <DTPOSTED>20240622120000 ... uses noon and drops the time zone..
+using qfx with this bank is fine since there is no timezone to cause day changes.
+Also found no long descriptions being truncated. Uses both the Description and Memo fields.
+
+Bank #3
+qfx file says ... <DTPOSTED>20240526230000 ... uses noon and drops the time zone..
+using qfx with this bank is fine since there is no timezone to cause day changes.
+Also found no long descriptions being truncated. Uses both the Description and Memo fields.
+
+Bank #4
+OFX <NAME> is limited to 32 characters. This chops off the long descriptions used on some transactions.
+qfx file says ... <DTPOSTED>20240610000000.000[-5:EDT] .. This says the transaction was posted at midnight on June 10 2024.
+This causes the dates on the transactions to shift to one day earlier (10pm on June 9 2024 CST).
+In Saskatchewan we do not use daylight savings time . We use pure CST.
+Part of the year we are either 1 hour behind Toronto or 2 hours behind Toronto. Toronto is EDT.
+If the account in moneydance had a property called timezone this would be a better way of tracking what timezone the transactions
+in the file represent.
+These two issues (Date Shifting and Description Truncation) have caused me to use CSV import with this bank.
+Also I want the transactions in moneydance to match what the bank says.
+
+I tried to use the built in csv import but it wants the date to look like yyyy/mm/dd and bank #4 uses yyyymmdd.
+(I found this out through trial and error!)
+The extension I ended up useing is the "CSV Importer".
+There is an excellent help article for the "CSV Importer" at https://github.com/stant/mdcsvimporter2015/releases/tag/helpv16
+The banks I use are CIBC, Scotia, Canadian Tire and BMO
+Hope this helps some other puzzled soul.
+..... update feb 24 2025
+looking at <DTPOSTED> in the downloaded .qfx files
+CIBC uses noon [-5:EST]
+Canadian Tire uses no time zone but fills in the hour
+Scotia Bank is using my timezone now [-8:MST] or GMT-8 .. how cool
+BMO is using 20250121000000.000[-5:EDT] which is midnight
+Most of Ontario is using EST in the winter and EDT in the summer:
+so BMO is located some where, where its summer time in February. lucky them.
+so of the 4 banks only BMO is causing me a problems.
+The day in my system gets shifted one day when I import the qfx.
+Its is caused by the midnight thing.
+The fix.
+two small scripts qfxStipper.py and gfxStripper.sh
+put them in /opt/moneydance/scritps
+now in kde do the following
+run ... kcmshell5 filetypes in a console
+then add a group to applications called "Quicken data"
+then under "Quicken data" general put *.qfx
+then add Applications to applications/Quicken data
+under "Application Preference Order" add
+/opt/moneydance/scripts/qfxStripper.sh
+Leafpad
+Mousepad
+Kate
+Make sure the stripper is at the top of the list.
+now open your Downloads folder with Dolphin
+click on a qfx file
+qfxStipper.py will run
+it only looks for [-5:EDT] and changes it to ''
+so if there are no [-5:EDT] in the qfx it doesn't change anything
+it will create a new qfx file called filename-fixed.qfx
+it will also creates a log /opt/moneydance/scripts/qfxStripper.log
+now you can drag and drop the C file into moneydance.
+Since BMO is the only bank that is causing me a problem you don't need to click on the qfx files from the other banks.
+just the BMO ones. so just drag and drop them as usual into moneydance .
+if you accidentally click on a qfx from a different bank its no big deal .
+you will just end up with a copy of the original .qfx file.
+this assumes you have Jython installed on your system.
+
+
+
