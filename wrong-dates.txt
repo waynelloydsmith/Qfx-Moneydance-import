@@ -69,7 +69,7 @@ it only looks for [-5:EDT] and changes it to ''
 so if there are no [-5:EDT] in the qfx it doesn't change anything
 it will create a new qfx file called filename-fixed.qfx
 it will also creates a log /opt/moneydance/scripts/qfxStripper.log
-now you can drag and drop the C file into moneydance.
+now you can drag and drop the filename-fixed.qfx file into moneydance.
 Since BMO is the only bank that is causing me a problem you don't need to click on the qfx files from the other banks.
 just the BMO ones. so just drag and drop them as usual into moneydance .
 if you accidentally click on a qfx from a different bank its no big deal .
